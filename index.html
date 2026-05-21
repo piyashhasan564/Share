@@ -748,10 +748,63 @@
             }
         }
 
+        // --- লিংক কপি করার আপডেট ফাংশন ---
         function copyLink() {
-            const link = document.getElementById('generated-link').innerText;
-            navigator.clipboard.writeText(link);
-            showPremiumPopup("লিংক কপি হয়েছে!", "এবার লিংকটি বন্ধুদের ইনবক্সে দিন।", "info");
+            let link = document.getElementById('generated-link').innerText;
+            
+            // যদি কোনো কারণে ডিফল্ট 'https://...' লেখা থাকে, তাহলে আসল লিংক বানিয়ে নিবে
+            if (!link.includes("?match=")) {
+                link = window.location.origin + window.location.pathname + "?match=" + currentMatchId;
+            }
+            
+            navigator.clipboard.writeText(link).then(() => {
+                showPremiumPopup("লিংক কপি হয়েছে!", "এবার লিংকটি বন্ধুদের ইনবক্সে পেস্ট করে দিন।", "success");
+            }).catch(() => {
+                alert("লিংক কপি করতে সমস্যা হয়েছে!");
+            });
+        }
+
+        // --- শেয়ার করার আপডেট ফাংশন (Messenger Forward Support) ---
+        async function shareMatchUrl() {
+            const teamAName = document.getElementById('ui-teamA-name').innerText;
+            const teamBName = document.getElementById('ui-teamB-name').innerText;
+            
+            // সঠিক ফুল লিংকটি জেনারেট করা
+            const matchUrl = window.location.origin + window.location.pathname + "?match=" + currentMatchId;
+            
+            const shareData = {
+                title: `${teamAName} vs ${teamBName} - Live War!`,
+                text: `লাইভ যুদ্ধ চলছে! ${teamAName} নাকি ${teamBName}? লিংকে ঢুকে তোমার দলকে জেতাও! 🏆\n\n`,
+                url: matchUrl 
+            };
+
+            // চেক করা হচ্ছে ইউজার ফেসবুক বা মেসেঞ্জারের ভেতর থেকে ব্রাউজ করছে কিনা
+            const ua = navigator.userAgent || navigator.vendor || window.opera;
+            const isFacebookApp = (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1) || (ua.indexOf("Messenger") > -1) || (ua.indexOf("FB_IAB") > -1);
+
+            if (isFacebookApp) {
+                // ইউজার মেসেঞ্জারে থাকলে সরাসরি মেসেঞ্জারের Forward/Share উইন্ডো ওপেন করবে
+                const messengerUrl = `fb-messenger://share/?link=${encodeURIComponent(matchUrl)}`;
+                window.location.href = messengerUrl;
+                return; // এখানেই কাজ শেষ
+            }
+            
+            // 1. Native Share (সাধারণ ক্রোম বা সাফারি ব্রাউজারের জন্য)
+            if (navigator.share) {
+                try {
+                    await navigator.share(shareData);
+                } catch (e) {
+                    console.log("Share cancelled by user.");
+                }
+            } 
+            // 2. যদি অন্য কোনো পিসি ব্রাউজার হয় যেখানে শেয়ার মেনু নেই, তখন লিংক কপি হবে
+            else {
+                navigator.clipboard.writeText(matchUrl).then(() => {
+                    showPremiumPopup("লিংক কপি হয়েছে!", "লিংকটি কপি করা হয়েছে। এবার বন্ধুদের ইনবক্সে পেস্ট করে দিন!", "info");
+                }).catch(() => {
+                    showPremiumPopup("সমস্যা!", "লিংক কপি করা যায়নি!", "error");
+                });
+            }
         }
 
         function goToMyMatch() {
@@ -890,25 +943,7 @@
         }
     });
 
-        async function shareMatchUrl() {
-            const teamAName = document.getElementById('ui-teamA-name').innerText;
-            const teamBName = document.getElementById('ui-teamB-name').innerText;
-            const shareData = {
-                title: `${teamAName} vs ${teamBName} - Live War!`,
-                text: `লাইভ যুদ্ধ চলছে! ${teamAName} নাকি ${teamBName}? লিংকে ঢুকে তোমার দলকে জেতাও! 🏆`,
-                url: window.location.href 
-            };
-            
-            if (navigator.share) {
-                try {
-                    await navigator.share(shareData);
-                } catch (e) {
-                    console.log("Share cancelled or failed");
-                }
-            } else {
-                copyLink();
-            }
-        }
+        
         // ফাইল আপলোড বক্সে ছবির নাম ও টিক মার্ক দেখানোর জন্য
         function updateFileName(inputId, labelId, boxId) {
             const input = document.getElementById(inputId);
