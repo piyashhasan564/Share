@@ -23,19 +23,45 @@
         .active-screen { display: flex; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card { background: #222; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); text-align: center; width: 100%; border: 1px solid rgba(255,255,255,0.1); }
-        .card h2 { color: #f1c40f; margin-bottom: 20px; font-size: 1.8rem; }
+        /* Premium 3D Card */
+        .card { 
+            background: linear-gradient(145deg, #2a2a35, #1e1e26); 
+            padding: 35px; border-radius: 24px; text-align: center; width: 100%; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8), inset 0 2px 1px rgba(255,255,255,0.1), inset 0 -2px 5px rgba(0,0,0,0.5); 
+            border: 1px solid rgba(255,255,255,0.05); 
+        }
+        .card h2 { color: #f1c40f; margin-bottom: 20px; font-size: 1.8rem; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
         
+        /* 3D Deep Inputs */
         input[type="text"], input[type="tel"], input[type="file"] {
-            width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: none; outline: none; font-size: 1rem; background: #333; color: white;
+            width: 100%; padding: 15px; margin-bottom: 18px; border-radius: 12px; border: 1px solid transparent; 
+            outline: none; font-size: 1rem; background: #141419; color: white; 
+            box-shadow: inset 0 5px 10px rgba(0,0,0,0.7), inset 0 -1px 2px rgba(255,255,255,0.05); 
+            transition: 0.3s;
         }
-        input[type="file"] { background: #444; color: #ccc; cursor: pointer; }
+        input[type="text"]:focus, input[type="tel"]:focus {
+            border: 1px solid #00c6ff;
+            box-shadow: inset 0 5px 10px rgba(0,0,0,0.7), 0 0 12px rgba(0, 198, 255, 0.4);
+        }
+        input[type="file"] { cursor: pointer; color: #ccc; }
 
+        /* 3D Submit Buttons */
         .submit-btn {
-            background: linear-gradient(135deg, #27ae60, #1e8449); color: white; border: none; padding: 15px 20px; font-size: 1.1rem; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; transition: 0.2s; box-shadow: 0 4px 15px rgba(39, 174, 96, 0.4);
+            background: linear-gradient(145deg, #00c6ff, #0072ff); color: white; border: none; padding: 15px 20px; 
+            font-size: 1.2rem; font-weight: 900; border-radius: 15px; cursor: pointer; width: 100%; transition: all 0.15s ease; 
+            box-shadow: 0 8px 0 #004ba0, 0 15px 25px rgba(0, 114, 255, 0.4), inset 0 2px 2px rgba(255,255,255,0.4); 
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
-        .submit-btn:hover { transform: scale(0.98); }
-        .dashboard-btn { background: linear-gradient(135deg, #2980b9, #1a5276); margin-bottom: 15px; }
+        .submit-btn:active { 
+            transform: translateY(8px); 
+            box-shadow: 0 0px 0 #004ba0, 0 5px 10px rgba(0, 114, 255, 0.4), inset 0 2px 2px rgba(255,255,255,0.4);
+        }
+
+        .dashboard-btn { 
+            background: linear-gradient(145deg, #27ae60, #1e8449); margin-bottom: 15px; 
+            box-shadow: 0 8px 0 #145a32, 0 15px 25px rgba(39, 174, 96, 0.4), inset 0 2px 2px rgba(255,255,255,0.4); 
+        }
+        .dashboard-btn:active { box-shadow: 0 0px 0 #145a32; transform: translateY(8px); }
 
         .spinner { width: 50px; height: 50px; border: 5px solid #333; border-top: 5px solid #f1c40f; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -52,41 +78,78 @@
         .game-title { font-size: 2.2rem; background: linear-gradient(90deg, #f1c40f, #f39c12); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 5px; text-transform: uppercase; font-weight: 900; }
         .game-subtitle { color: #b3b3b3; font-size: 1rem; margin-bottom: 25px; }
 
-        .scoreboard { position: relative; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(145deg, rgba(30, 30, 30, 0.8), rgba(15, 15, 15, 0.9)); border: 1px solid rgba(255, 255, 255, 0.05); padding: 25px 20px; border-radius: 20px; margin-bottom: 20px; width: 100%; }
+        .scoreboard { position: relative; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(145deg, rgba(30, 30, 30, 0.8), rgba(15, 15, 15, 0.9)); border: 1px solid rgba(255, 255, 255, 0.05); padding: 25px 20px; border-radius: 20px; margin-bottom: 20px; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .team { flex: 1; text-align: center; z-index: 1; display: flex; flex-direction: column; align-items: center;}
-        .team-logo { width: 50px; height: 50px; border-radius: 50%; margin-bottom: 8px; border: 2px solid #555; object-fit: cover;}
+        .team-logo { width: 50px; height: 50px; border-radius: 50%; margin-bottom: 8px; border: 2px solid #555; object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.5);}
         .teamA-title { color: #6cb4ee; font-size: 1.2rem; margin-bottom: 2px; font-weight: 700; word-break: break-word;}
         .teamB-title { color: #ff4d4d; font-size: 1.2rem; margin-bottom: 2px; font-weight: 700; word-break: break-word;}
-        .score { font-size: 2.2rem; font-weight: 900; }
+        .score { font-size: 2.2rem; font-weight: 900; text-shadow: 0 4px 10px rgba(0,0,0,0.8); }
 
-        .vs-badge { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); background: #111; border: 2px solid #444; color: #fff; font-size: 1.2rem; font-weight: 900; font-style: italic; padding: 12px 12px; border-radius: 50%; z-index: 2; }
+        .vs-badge { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); background: linear-gradient(145deg, #222, #111); border: 2px solid #444; color: #fff; font-size: 1.2rem; font-weight: 900; font-style: italic; padding: 12px 12px; border-radius: 50%; z-index: 2; box-shadow: 0 5px 15px rgba(0,0,0,0.8); }
 
-        .progress-container { width: 100%; height: 22px; background: #1a1a1a; border-radius: 12px; display: flex; margin-bottom: 35px; overflow: hidden; border: 1px solid #333;}
-        #teamA-progress { height: 100%; background: linear-gradient(90deg, #1f618d, #6cb4ee); transition: width 0.4s; }
-        #teamB-progress { height: 100%; background: linear-gradient(90deg, #ff4d4d, #922b21); transition: width 0.4s; }
+        .progress-container { width: 100%; height: 22px; background: #1a1a1a; border-radius: 12px; display: flex; margin-bottom: 35px; overflow: hidden; border: 1px solid #333; box-shadow: inset 0 5px 10px rgba(0,0,0,0.8); }
+        #teamA-progress { height: 100%; background: linear-gradient(90deg, #1f618d, #6cb4ee); transition: width 0.4s; box-shadow: inset 0 2px 5px rgba(255,255,255,0.3); }
+        #teamB-progress { height: 100%; background: linear-gradient(90deg, #ff4d4d, #922b21); transition: width 0.4s; box-shadow: inset 0 2px 5px rgba(255,255,255,0.3); }
 
+        /* 3D Game Voting Buttons */
         .buttons { display: flex; gap: 15px; width: 100%; justify-content: space-between; }
-        .click-btn { flex: 1; padding: 20px 5px; font-size: 1.1rem; font-weight: 900; border: none; border-radius: 18px; cursor: pointer; color: white; display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .btn-teamA { background: linear-gradient(135deg, #2980b9, #1a5276); border: 1px solid rgba(108, 180, 238, 0.4); box-shadow: 0 8px 0 #154360;}
-        .btn-teamA:active { box-shadow: 0 0px 0 #154360; transform: translateY(8px); }
-        .btn-teamB { background: linear-gradient(135deg, #e74c3c, #7b241c); border: 1px solid rgba(255, 77, 77, 0.4); box-shadow: 0 8px 0 #641e16;}
-        .btn-teamB:active { box-shadow: 0 0px 0 #641e16; transform: translateY(8px); }
+        .click-btn { 
+            flex: 1; padding: 20px 5px; font-size: 1.1rem; font-weight: 900; border: none; border-radius: 20px; 
+            cursor: pointer; color: white; display: flex; flex-direction: column; align-items: center; gap: 5px; 
+            text-shadow: 0 2px 5px rgba(0,0,0,0.5); transition: all 0.1s ease;
+        }
+        .btn-teamA { 
+            background: linear-gradient(135deg, #2980b9, #1a5276); 
+            box-shadow: 0 10px 0 #0e2f44, 0 15px 30px rgba(41, 128, 185, 0.5), inset 0 2px 2px rgba(255,255,255,0.3); 
+        }
+        .btn-teamA:active { 
+            box-shadow: 0 0px 0 #0e2f44, 0 5px 10px rgba(41, 128, 185, 0.5); transform: translateY(10px); 
+        }
+        .btn-teamB { 
+            background: linear-gradient(135deg, #e74c3c, #7b241c); 
+            box-shadow: 0 10px 0 #4a1510, 0 15px 30px rgba(231, 76, 60, 0.5), inset 0 2px 2px rgba(255,255,255,0.3); 
+        }
+        .btn-teamB:active { 
+            box-shadow: 0 0px 0 #4a1510, 0 5px 10px rgba(231, 76, 60, 0.5); transform: translateY(10px); 
+        }
 
-        .share-btn { margin-top: 30px; padding: 12px 25px; font-size: 1.1rem; background: #27ae60; color: white; border: none; border-radius: 25px; cursor: pointer; font-weight: bold; width: 100%; }
-        .link-box { background: #111; padding: 15px; border-radius: 8px; margin: 15px 0; word-break: break-all; color: #6cb4ee; font-size: 0.9rem; border: 1px dashed #555;}
+        .share-btn { 
+            margin-top: 30px; padding: 15px 25px; font-size: 1.1rem; background: linear-gradient(145deg, #ff9f43, #ff6b6b); 
+            color: white; border: none; border-radius: 25px; cursor: pointer; font-weight: bold; width: 100%; 
+            box-shadow: 0 8px 0 #c0392b, 0 15px 25px rgba(255, 107, 107, 0.4), inset 0 2px 2px rgba(255,255,255,0.4); 
+            transition: all 0.15s ease;
+        }
+        .share-btn:active { box-shadow: 0 0px 0 #c0392b; transform: translateY(8px); }
+        
+        .link-box { background: #111; padding: 15px; border-radius: 12px; margin: 15px 0; word-break: break-all; color: #6cb4ee; font-size: 0.9rem; border: 1px dashed #555; box-shadow: inset 0 5px 10px rgba(0,0,0,0.8); }
+    .flex-center { display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .game-title { letter-spacing: 4px; text-shadow: 0 4px 15px rgba(241, 196, 15, 0.4); }
+        .click-icon { width: 28px; height: 28px; margin-top: 5px; opacity: 0.9; }
     </style>
 </head>
 <body>
 
+ 
+
     <!-- 1. Profile Setup Screen -->
     <div id="welcome-screen" class="screen">
         <div class="card">
-            <h2>🔥 প্ল্যাটফর্মে স্বাগতম</h2>
-            <p style="margin-bottom: 20px; color: #aaa;">আপনার নাম, নাম্বার এবং ছবি দিন</p>
+            <h2 class="flex-center">
+                <svg width="28" height="28" fill="none" stroke="#f1c40f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                প্ল্যাটফর্মে স্বাগতম
+            </h2>
+            <p style="margin-bottom: 20px; color: #aaa;">আপনার নাম এবং নাম্বার দিন</p>
+            
             <input type="text" id="user-name-input" placeholder="আপনার নাম লিখুন..." required>
             <input type="tel" id="user-phone-input" placeholder="আপনার মোবাইল নাম্বার (যেমন: 017...)" required>
-            <input type="file" id="user-image-input" accept="image/*" required>
-            <button class="submit-btn" onclick="setupProfile()">প্রবেশ করুন 🚀</button>
+            
+            <p style="font-size: 0.85rem; color: #888; text-align: left; margin-bottom: 5px;">প্রোফাইল ছবি (ঐচ্ছিক):</p>
+            <input type="file" id="user-image-input" accept="image/*">
+            
+            <button class="submit-btn flex-center" onclick="setupProfile()">
+                প্রবেশ করুন
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
         </div>
     </div>
 
@@ -105,7 +168,10 @@
             </div>
         </div>
         <div class="card">
-            <h2>🎮 নতুন ম্যাচ তৈরি করুন</h2>
+            <h2 class="flex-center">
+                <svg width="28" height="28" fill="none" stroke="#f1c40f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                নতুন ম্যাচ তৈরি করুন
+            </h2>
             <p style="color:#aaa; margin-bottom:15px;">আপনার পছন্দমতো দুটি দল তৈরি করুন</p>
             
             <h4 style="color:#6cb4ee; text-align:left; margin-bottom:5px;">Team A (বাম পাশ)</h4>
@@ -116,8 +182,97 @@
             <input type="text" id="teamB-name-input" placeholder="২য় দলের নাম (যেমন: Arts)" required>
             <input type="file" id="teamB-image-input" accept="image/*" required>
 
-            <button class="submit-btn dashboard-btn" onclick="createMatch()" style="margin-top:15px;">ম্যাচ তৈরি করুন ⚔️</button>
+            <button class="submit-btn dashboard-btn flex-center" onclick="createMatch()" style="margin-top:15px;">
+                ম্যাচ তৈরি করুন
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
         </div>
+    </div>
+
+    <!-- 3. Loading Screen -->
+    <div id="loading-screen" class="screen">
+        <div class="spinner"></div>
+        <h3 id="loading-text" style="color: #f1c40f; font-weight: 600; letter-spacing: 1px;">অপেক্ষা করুন...</h3>
+    </div>
+
+    <!-- 4. Share Link Screen -->
+    <div id="share-link-screen" class="screen">
+        <div class="card">
+            <h2 class="flex-center">
+                <svg width="28" height="28" fill="none" stroke="#2ecc71" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                ম্যাচ তৈরি সফল!
+            </h2>
+            <p style="color:#aaa;">নিচের লিংকটি কপি করে বন্ধুদের পাঠান।</p>
+            <div class="link-box" id="generated-link">https://...</div>
+            
+            <button class="submit-btn dashboard-btn flex-center" onclick="copyLink()">
+                লিংক কপি করুন
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+            <button class="submit-btn flex-center" onclick="goToMyMatch()">
+                খেলায় প্রবেশ করুন
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- 5. Main Game Screen -->
+    <div id="main-screen" class="screen">
+        <div class="top-bar">
+            <div class="profile-badge">
+                <div class="avatar-container">
+                    <img src="" alt="User" class="user-avatar display-avatar">
+                    <span class="online-dot"></span>
+                </div>
+                <div class="user-info">
+                    <span class="user-name display-name">Name</span>
+                    <span class="user-status">● Online</span>
+                </div>
+            </div>
+        </div>
+
+        <h1 class="game-title">TEAM WAR</h1>
+        <h3 class="game-subtitle">আপনার দলকে জেতাতে ট্যাপ করুন</h3>
+
+        <div class="scoreboard">
+            <div class="team">
+                <img id="ui-teamA-logo" class="team-logo" src="">
+                <h3 id="ui-teamA-name" class="teamA-title">Team A</h3>
+                <p id="score-teamA" class="score">0</p>
+            </div>
+            <div class="vs-badge">VS</div>
+            <div class="team">
+                <img id="ui-teamB-logo" class="team-logo" src="">
+                <h3 id="ui-teamB-name" class="teamB-title">Team B</h3>
+                <p id="score-teamB" class="score">0</p>
+            </div>
+        </div>
+
+        <div class="progress-container">
+            <div id="teamA-progress" style="width: 50%;"></div>
+            <div id="teamB-progress" style="width: 50%;"></div>
+        </div>
+
+        <div class="buttons">
+            <button id="btn-teamA" class="click-btn btn-teamA">
+                <span id="btn-textA">VOTE A</span>
+                <svg class="click-icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </button>
+            <button id="btn-teamB" class="click-btn btn-teamB">
+                <span id="btn-textB">VOTE B</span>
+                <svg class="click-icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </button>
+        </div>
+
+        <button class="share-btn flex-center" onclick="shareMatchUrl()">
+            বন্ধুদের চ্যালেঞ্জ করুন
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        </button>
+        
+        <button class="share-btn flex-center" onclick="goHome()" style="background: linear-gradient(145deg, #444, #222); margin-top:15px; box-shadow: 0 8px 0 #111;">
+            নতুন ম্যাচ বানান
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </button>
     </div>
 
     <!-- 3. Loading Screen -->
@@ -222,6 +377,7 @@
         // --- App Initialization ---
         window.onload = () => {
             const savedPhone = localStorage.getItem('savedPhone');
+            const showDash = urlParams.get('dashboard'); // ইউজার ড্যাশবোর্ডে যেতে চাইছে কি না
 
             if (savedPhone) {
                 currentUserPhone = savedPhone;
@@ -232,9 +388,11 @@
                         updateProfileUI(userData.name, userData.profileImage, userData.matchCreatedCount);
                         
                         if (requestedMatch) {
-                            loadMatch(requestedMatch);
+                            loadMatch(requestedMatch); // যদি অন্য কারও পাঠানো লিংকে ঢুকে থাকে
+                        } else if (!showDash && userData.lastMatchId) {
+                            loadMatch(userData.lastMatchId); // অটোমেটিক নিজের বানানো লাস্ট ম্যাচে ঢুকবে
                         } else {
-                            showScreen('dashboard-screen');
+                            showScreen('dashboard-screen'); // যদি লাস্ট ম্যাচ না থাকে বা নতুন ম্যাচ বানাতে চায়
                         }
                     } else {
                         showScreen('welcome-screen');
@@ -264,44 +422,50 @@
             throw new Error("ImgBB Upload failed");
         }
 
-        // --- Profile Setup (Firestore) ---
+     // --- Profile Setup (Firestore + Optional Image) ---
         async function setupProfile() {
             const name = document.getElementById('user-name-input').value;
             const phone = document.getElementById('user-phone-input').value;
             const file = document.getElementById('user-image-input').files[0];
 
-            if (!name || !phone || !file) return alert("দয়া করে নাম, নাম্বার এবং ছবি দিন!");
+            if (!name || !phone) return alert("দয়া করে নাম এবং নাম্বার দিন!");
 
             document.getElementById('loading-text').innerText = "অ্যাকাউন্ট তৈরি হচ্ছে...";
             showScreen('loading-screen');
 
             try {
-                // ১. আগে ছবি আপলোড করবে
-                const imgUrl = await uploadImage(file);
+                let imgUrl = `https://ui-avatars.com/api/?name=${name}&background=random&color=fff&size=128&bold=true`; 
+                if (file) {
+                    imgUrl = await uploadImage(file);
+                }
                 
-                // ২. চেক করবে এই নাম্বারে আগে একাউন্ট আছে কি না
                 const userRef = db.collection('users').doc(phone);
                 const doc = await userRef.get();
                 
                 let matchCount = 0;
+                let lastMatch = null; // লাস্ট ম্যাচের ভ্যারিয়েবল
+                
                 if(doc.exists) {
                     matchCount = doc.data().matchCreatedCount || 0;
+                    lastMatch = doc.data().lastMatchId || null;
                 }
 
-                // ৩. ইউজারের ডাটা Firestore-এ সেভ করবে
                 await userRef.set({
                     name: name,
                     phone: phone,
                     profileImage: imgUrl,
-                    matchCreatedCount: matchCount 
-                }, { merge: true }); // merge: true দিলে আগের ডাটা ডিলিট হবে না
+                    matchCreatedCount: matchCount,
+                    lastMatchId: lastMatch // লগিনের সময় লাস্ট ম্যাচ আইডি ঠিক রাখা
+                }, { merge: true });
 
-                // ৪. মোবাইলে নাম্বার সেভ করে রাখবে
                 localStorage.setItem('savedPhone', phone);
                 currentUserPhone = phone;
                 updateProfileUI(name, imgUrl, matchCount);
 
+                const showDash = urlParams.get('dashboard');
+                
                 if (requestedMatch) loadMatch(requestedMatch);
+                else if (!showDash && lastMatch) loadMatch(lastMatch);
                 else showScreen('dashboard-screen');
 
             } catch (e) {
@@ -325,7 +489,6 @@
             try {
                 const [urlA, urlB] = await Promise.all([ uploadImage(fileA), uploadImage(fileB) ]);
 
-                // Firestore-এ ম্যাচ সেভ করা
                 const docRef = await db.collection('matches').add({
                     creatorPhone: currentUserPhone,
                     teamA: { name: nameA, logo: urlA, score: 0 },
@@ -335,13 +498,13 @@
 
                 currentMatchId = docRef.id;
 
-                // ইউজারের ম্যাচ বানানোর কাউন্ট ১ বাড়িয়ে দেওয়া
                 if(currentUserPhone) {
+                    // এখানে lastMatchId যুক্ত করা হলো
                     await db.collection('users').doc(currentUserPhone).update({
-                        matchCreatedCount: firebase.firestore.FieldValue.increment(1)
+                        matchCreatedCount: firebase.firestore.FieldValue.increment(1),
+                        lastMatchId: currentMatchId 
                     });
                     
-                    // ড্যাশবোর্ডের লেখা আপডেট করা
                     const userDoc = await db.collection('users').doc(currentUserPhone).get();
                     document.getElementById('display-matches').innerText = "ম্যাচ বানিয়েছেন: " + userDoc.data().matchCreatedCount;
                 }
@@ -367,8 +530,12 @@
         }
 
         function goHome() {
-            window.location.href = window.location.pathname;
+            // ড্যাশবোর্ডে যাওয়ার স্পেশাল লিংক
+            window.location.href = window.location.pathname + "?dashboard=true";
         }
+
+        // Global Variable for Voting State
+        let hasVoted = false;
 
         // --- Play Match Logic (Firestore Live Snapshot) ---
         function loadMatch(matchId) {
@@ -385,16 +552,29 @@
 
                 const data = doc.data();
 
+                // UI প্রথমবার লোড হওয়া
                 if(document.getElementById('main-screen').style.display !== 'flex'){
                     document.getElementById('ui-teamA-name').innerText = data.teamA.name;
                     document.getElementById('ui-teamB-name').innerText = data.teamB.name;
                     document.getElementById('ui-teamA-logo').src = data.teamA.logo;
                     document.getElementById('ui-teamB-logo').src = data.teamB.logo;
-                    document.getElementById('btn-textA').innerText = "VOTE " + data.teamA.name.substring(0,6);
-                    document.getElementById('btn-textB').innerText = "VOTE " + data.teamB.name.substring(0,6);
+                    document.getElementById('btn-textA').innerText = "VOTE";
+                    document.getElementById('btn-textB').innerText = "VOTE";
                     showScreen('main-screen');
                 }
 
+                // *** চেক করা যে ইউজার আগে ভোট দিয়েছে কি না ***
+                const voters = data.voters || [];
+                if (voters.includes(currentUserPhone)) {
+                    hasVoted = true;
+                    // বাটনগুলো ডিজেবল করে দেওয়া
+                    document.getElementById('btn-teamA').classList.add('disabled-btn');
+                    document.getElementById('btn-teamB').classList.add('disabled-btn');
+                    document.getElementById('btn-textA').innerText = "VOTED";
+                    document.getElementById('btn-textB').innerText = "VOTED";
+                }
+
+                // লাইভ স্কোর আপডেট
                 const scoreA = data.teamA.score || 0;
                 const scoreB = data.teamB.score || 0;
                 
@@ -410,20 +590,28 @@
             });
         }
 
-        // --- Click Events (Firestore Increment) ---
+        // --- Click Events (Firestore Increment & Saving Voter) ---
         document.getElementById('btn-teamA').addEventListener('click', () => {
-            if(!currentMatchId) return;
+            if(!currentMatchId || hasVoted) return; // আগে ভোট দিয়ে থাকলে কাজ করবে না
+            hasVoted = true; // সাথে সাথে লক করে দেওয়া হলো যেন ডাবল ক্লিক না করতে পারে
+            
             db.collection('matches').doc(currentMatchId).update({ 
-                "teamA.score": firebase.firestore.FieldValue.increment(1) 
-            });
+                "teamA.score": firebase.firestore.FieldValue.increment(1),
+                "voters": firebase.firestore.FieldValue.arrayUnion(currentUserPhone) // ইউজারের নাম্বার সেভ করে রাখা
+            }).catch(e => { hasVoted = false; });
+            
             if (navigator.vibrate) navigator.vibrate(30);
         });
 
         document.getElementById('btn-teamB').addEventListener('click', () => {
-            if(!currentMatchId) return;
+            if(!currentMatchId || hasVoted) return;
+            hasVoted = true;
+            
             db.collection('matches').doc(currentMatchId).update({ 
-                "teamB.score": firebase.firestore.FieldValue.increment(1) 
-            });
+                "teamB.score": firebase.firestore.FieldValue.increment(1),
+                "voters": firebase.firestore.FieldValue.arrayUnion(currentUserPhone) 
+            }).catch(e => { hasVoted = false; });
+
             if (navigator.vibrate) navigator.vibrate(30);
         });
 
@@ -435,8 +623,17 @@
                 text: `লাইভ যুদ্ধ চলছে! ${teamAName} নাকি ${teamBName}? লিংকে ঢুকে তোমার দলকে জেতাও! 🏆`,
                 url: window.location.href 
             };
-            if (navigator.share) await navigator.share(shareData);
-            else copyLink(); 
+            
+            // এই navigator.share সিস্টেমটিই আপনার স্ক্রিনশটের মেনু ওপেন করবে
+            if (navigator.share) {
+                try {
+                    await navigator.share(shareData);
+                } catch (e) {
+                    console.log("Share cancelled or failed");
+                }
+            } else {
+                copyLink(); // মোবাইল ব্রাউজার না হলে বা অফলাইন ফাইল হলে শুধু কপি হবে
+            }
         }
     </script>
 </body>
