@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team War - Live Battle Platform</title>
+    
+    <!-- Firebase SDK (Version 8) - changed database to firestore -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700;900&display=swap');
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Hind Siliguri', sans-serif; }
+
+        body {
+            background-color: #121212; color: white; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; min-height: 100vh; overflow-x: hidden; padding: 20px;
+        }
+
+        .screen { display: none; width: 100%; max-width: 500px; flex-direction: column; align-items: center; animation: fadeIn 0.5s ease; }
+        .active-screen { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .card { background: #222; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); text-align: center; width: 100%; border: 1px solid rgba(255,255,255,0.1); }
+        .card h2 { color: #f1c40f; margin-bottom: 20px; font-size: 1.8rem; }
+        
+        input[type="text"], input[type="tel"], input[type="file"] {
+            width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: none; outline: none; font-size: 1rem; background: #333; color: white;
+        }
+        input[type="file"] { background: #444; color: #ccc; cursor: pointer; }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #27ae60, #1e8449); color: white; border: none; padding: 15px 20px; font-size: 1.1rem; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; transition: 0.2s; box-shadow: 0 4px 15px rgba(39, 174, 96, 0.4);
+        }
+        .submit-btn:hover { transform: scale(0.98); }
+        .dashboard-btn { background: linear-gradient(135deg, #2980b9, #1a5276); margin-bottom: 15px; }
+
+        .spinner { width: 50px; height: 50px; border: 5px solid #333; border-top: 5px solid #f1c40f; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .top-bar { width: 100%; display: flex; justify-content: flex-start; align-items: center; margin-bottom: 20px; }
+        .profile-badge { display: flex; align-items: center; gap: 12px; background: rgba(255, 255, 255, 0.08); padding: 6px 18px 6px 6px; border-radius: 50px; border: 1px solid rgba(241, 196, 15, 0.3); backdrop-filter: blur(8px); }
+        .avatar-container { position: relative; }
+        .user-avatar { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #f1c40f; }
+        .online-dot { position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px; background-color: #2ecc71; border: 2px solid #222; border-radius: 50%; }
+        .user-info { display: flex; flex-direction: column; align-items: flex-start; }
+        .user-name { font-size: 1.05rem; font-weight: bold; color: #ffffff; line-height: 1.2; }
+        .user-status { font-size: 0.75rem; color: #2ecc71; font-weight: 600; }
+
+        .game-title { font-size: 2.2rem; background: linear-gradient(90deg, #f1c40f, #f39c12); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 5px; text-transform: uppercase; font-weight: 900; }
+        .game-subtitle { color: #b3b3b3; font-size: 1rem; margin-bottom: 25px; }
+
+        .scoreboard { position: relative; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(145deg, rgba(30, 30, 30, 0.8), rgba(15, 15, 15, 0.9)); border: 1px solid rgba(255, 255, 255, 0.05); padding: 25px 20px; border-radius: 20px; margin-bottom: 20px; width: 100%; }
+        .team { flex: 1; text-align: center; z-index: 1; display: flex; flex-direction: column; align-items: center;}
+        .team-logo { width: 50px; height: 50px; border-radius: 50%; margin-bottom: 8px; border: 2px solid #555; object-fit: cover;}
+        .teamA-title { color: #6cb4ee; font-size: 1.2rem; margin-bottom: 2px; font-weight: 700; word-break: break-word;}
+        .teamB-title { color: #ff4d4d; font-size: 1.2rem; margin-bottom: 2px; font-weight: 700; word-break: break-word;}
+        .score { font-size: 2.2rem; font-weight: 900; }
+
+        .vs-badge { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); background: #111; border: 2px solid #444; color: #fff; font-size: 1.2rem; font-weight: 900; font-style: italic; padding: 12px 12px; border-radius: 50%; z-index: 2; }
+
+        .progress-container { width: 100%; height: 22px; background: #1a1a1a; border-radius: 12px; display: flex; margin-bottom: 35px; overflow: hidden; border: 1px solid #333;}
+        #teamA-progress { height: 100%; background: linear-gradient(90deg, #1f618d, #6cb4ee); transition: width 0.4s; }
+        #teamB-progress { height: 100%; background: linear-gradient(90deg, #ff4d4d, #922b21); transition: width 0.4s; }
+
+        .buttons { display: flex; gap: 15px; width: 100%; justify-content: space-between; }
+        .click-btn { flex: 1; padding: 20px 5px; font-size: 1.1rem; font-weight: 900; border: none; border-radius: 18px; cursor: pointer; color: white; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .btn-teamA { background: linear-gradient(135deg, #2980b9, #1a5276); border: 1px solid rgba(108, 180, 238, 0.4); box-shadow: 0 8px 0 #154360;}
+        .btn-teamA:active { box-shadow: 0 0px 0 #154360; transform: translateY(8px); }
+        .btn-teamB { background: linear-gradient(135deg, #e74c3c, #7b241c); border: 1px solid rgba(255, 77, 77, 0.4); box-shadow: 0 8px 0 #641e16;}
+        .btn-teamB:active { box-shadow: 0 0px 0 #641e16; transform: translateY(8px); }
+
+        .share-btn { margin-top: 30px; padding: 12px 25px; font-size: 1.1rem; background: #27ae60; color: white; border: none; border-radius: 25px; cursor: pointer; font-weight: bold; width: 100%; }
+        .link-box { background: #111; padding: 15px; border-radius: 8px; margin: 15px 0; word-break: break-all; color: #6cb4ee; font-size: 0.9rem; border: 1px dashed #555;}
+    </style>
+</head>
+<body>
+
+    <!-- 1. Profile Setup Screen -->
+    <div id="welcome-screen" class="screen">
+        <div class="card">
+            <h2>🔥 প্ল্যাটফর্মে স্বাগতম</h2>
+            <p style="margin-bottom: 20px; color: #aaa;">আপনার নাম, নাম্বার এবং ছবি দিন</p>
+            <input type="text" id="user-name-input" placeholder="আপনার নাম লিখুন..." required>
+            <input type="tel" id="user-phone-input" placeholder="আপনার মোবাইল নাম্বার (যেমন: 017...)" required>
+            <input type="file" id="user-image-input" accept="image/*" required>
+            <button class="submit-btn" onclick="setupProfile()">প্রবেশ করুন 🚀</button>
+        </div>
+    </div>
+
+    <!-- 2. Dashboard Screen (Create Match) -->
+    <div id="dashboard-screen" class="screen">
+        <div class="top-bar">
+            <div class="profile-badge">
+                <div class="avatar-container">
+                    <img src="" alt="User" class="user-avatar display-avatar">
+                    <span class="online-dot"></span>
+                </div>
+                <div class="user-info">
+                    <span class="user-name display-name">Name</span>
+                    <span class="user-status" id="display-matches">ম্যাচ বানিয়েছেন: 0</span>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <h2>🎮 নতুন ম্যাচ তৈরি করুন</h2>
+            <p style="color:#aaa; margin-bottom:15px;">আপনার পছন্দমতো দুটি দল তৈরি করুন</p>
+            
+            <h4 style="color:#6cb4ee; text-align:left; margin-bottom:5px;">Team A (বাম পাশ)</h4>
+            <input type="text" id="teamA-name-input" placeholder="১ম দলের নাম (যেমন: Science)" required>
+            <input type="file" id="teamA-image-input" accept="image/*" required>
+
+            <h4 style="color:#ff4d4d; text-align:left; margin-bottom:5px; margin-top:10px;">Team B (ডান পাশ)</h4>
+            <input type="text" id="teamB-name-input" placeholder="২য় দলের নাম (যেমন: Arts)" required>
+            <input type="file" id="teamB-image-input" accept="image/*" required>
+
+            <button class="submit-btn dashboard-btn" onclick="createMatch()" style="margin-top:15px;">ম্যাচ তৈরি করুন ⚔️</button>
+        </div>
+    </div>
+
+    <!-- 3. Loading Screen -->
+    <div id="loading-screen" class="screen">
+        <div class="spinner"></div>
+        <h3 id="loading-text" style="color: #f1c40f;">অপেক্ষা করুন...</h3>
+    </div>
+
+    <!-- 4. Share Link Screen -->
+    <div id="share-link-screen" class="screen">
+        <div class="card">
+            <h2>✅ ম্যাচ তৈরি সফল!</h2>
+            <p style="color:#aaa;">নিচের লিংকটি কপি করে বন্ধুদের পাঠান।</p>
+            <div class="link-box" id="generated-link">https://...</div>
+            <button class="submit-btn dashboard-btn" onclick="copyLink()">লিংক কপি করুন 📋</button>
+            <button class="submit-btn" onclick="goToMyMatch()">খেলায় প্রবেশ করুন 🚀</button>
+        </div>
+    </div>
+
+    <!-- 5. Main Game Screen -->
+    <div id="main-screen" class="screen">
+        <div class="top-bar">
+            <div class="profile-badge">
+                <div class="avatar-container">
+                    <img src="" alt="User" class="user-avatar display-avatar">
+                    <span class="online-dot"></span>
+                </div>
+                <div class="user-info">
+                    <span class="user-name display-name">Name</span>
+                    <span class="user-status">● Online</span>
+                </div>
+            </div>
+        </div>
+
+        <h1 class="game-title">🏆 Team War 🏆</h1>
+        <h3 class="game-subtitle">আপনার দলকে জেতাতে ক্লিক করুন!</h3>
+
+        <div class="scoreboard">
+            <div class="team">
+                <img id="ui-teamA-logo" class="team-logo" src="">
+                <h3 id="ui-teamA-name" class="teamA-title">Team A</h3>
+                <p id="score-teamA" class="score">0</p>
+            </div>
+            <div class="vs-badge">VS</div>
+            <div class="team">
+                <img id="ui-teamB-logo" class="team-logo" src="">
+                <h3 id="ui-teamB-name" class="teamB-title">Team B</h3>
+                <p id="score-teamB" class="score">0</p>
+            </div>
+        </div>
+
+        <div class="progress-container">
+            <div id="teamA-progress" style="width: 50%;"></div>
+            <div id="teamB-progress" style="width: 50%;"></div>
+        </div>
+
+        <div class="buttons">
+            <button id="btn-teamA" class="click-btn btn-teamA">
+                <span id="btn-textA">VOTE A</span>
+                <span style="font-size: 1.8rem;">👆</span>
+            </button>
+            <button id="btn-teamB" class="click-btn btn-teamB">
+                <span id="btn-textB">VOTE B</span>
+                <span style="font-size: 1.8rem;">👆</span>
+            </button>
+        </div>
+
+        <button class="share-btn" onclick="shareMatchUrl()">📲 বন্ধুদের চ্যালেঞ্জ করুন!</button>
+        <button class="share-btn" onclick="goHome()" style="background:#444; margin-top:15px; box-shadow:none;">🏠 নতুন ম্যাচ বানান</button>
+    </div>
+
+    <script>
+        // --- Firebase Configuration ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyD6tVkzHsU4wUzguFsZnAQVVQzm3j0rmr0",
+            authDomain: "share-e4fdc.firebaseapp.com",
+            projectId: "share-e4fdc",
+            storageBucket: "share-e4fdc.firebasestorage.app",
+            messagingSenderId: "666417532516",
+            appId: "1:666417532516:web:d39b6dea7ca02ad5a19971",
+            measurementId: "G-RHXSRFXPR1"
+        };
+        firebase.initializeApp(firebaseConfig);
+        
+        // Firestore Initialize
+        const db = firebase.firestore();
+
+        // ImgBB API Key
+        const IMGBB_API_KEY = "2c15582c6548f043b824081421986562"; 
+
+        // Global Variables
+        let currentMatchId = null;
+        let currentUserPhone = null; 
+        const urlParams = new URLSearchParams(window.location.search);
+        const requestedMatch = urlParams.get('match'); 
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
+            document.getElementById(screenId).classList.add('active-screen');
+        }
+
+        // --- App Initialization ---
+        window.onload = () => {
+            const savedPhone = localStorage.getItem('savedPhone');
+
+            if (savedPhone) {
+                currentUserPhone = savedPhone;
+                // Firestore থেকে ইউজারের ডাটা আনবে
+                db.collection('users').doc(savedPhone).get().then((doc) => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        updateProfileUI(userData.name, userData.profileImage, userData.matchCreatedCount);
+                        
+                        if (requestedMatch) {
+                            loadMatch(requestedMatch);
+                        } else {
+                            showScreen('dashboard-screen');
+                        }
+                    } else {
+                        showScreen('welcome-screen');
+                    }
+                }).catch((error) => {
+                    console.log("Error getting document:", error);
+                    showScreen('welcome-screen');
+                });
+            } else {
+                showScreen('welcome-screen');
+            }
+        };
+
+        function updateProfileUI(name, img, matchCount = 0) {
+            document.querySelectorAll('.display-name').forEach(el => el.innerText = name);
+            document.querySelectorAll('.display-avatar').forEach(el => el.src = img);
+            const countEl = document.getElementById('display-matches');
+            if(countEl) countEl.innerText = "ম্যাচ বানিয়েছেন: " + matchCount;
+        }
+
+        async function uploadImage(file) {
+            const formData = new FormData();
+            formData.append("image", file);
+            const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: formData });
+            const data = await res.json();
+            if (data.success) return data.data.url;
+            throw new Error("ImgBB Upload failed");
+        }
+
+        // --- Profile Setup (Firestore) ---
+        async function setupProfile() {
+            const name = document.getElementById('user-name-input').value;
+            const phone = document.getElementById('user-phone-input').value;
+            const file = document.getElementById('user-image-input').files[0];
+
+            if (!name || !phone || !file) return alert("দয়া করে নাম, নাম্বার এবং ছবি দিন!");
+
+            document.getElementById('loading-text').innerText = "অ্যাকাউন্ট তৈরি হচ্ছে...";
+            showScreen('loading-screen');
+
+            try {
+                // ১. আগে ছবি আপলোড করবে
+                const imgUrl = await uploadImage(file);
+                
+                // ২. চেক করবে এই নাম্বারে আগে একাউন্ট আছে কি না
+                const userRef = db.collection('users').doc(phone);
+                const doc = await userRef.get();
+                
+                let matchCount = 0;
+                if(doc.exists) {
+                    matchCount = doc.data().matchCreatedCount || 0;
+                }
+
+                // ৩. ইউজারের ডাটা Firestore-এ সেভ করবে
+                await userRef.set({
+                    name: name,
+                    phone: phone,
+                    profileImage: imgUrl,
+                    matchCreatedCount: matchCount 
+                }, { merge: true }); // merge: true দিলে আগের ডাটা ডিলিট হবে না
+
+                // ৪. মোবাইলে নাম্বার সেভ করে রাখবে
+                localStorage.setItem('savedPhone', phone);
+                currentUserPhone = phone;
+                updateProfileUI(name, imgUrl, matchCount);
+
+                if (requestedMatch) loadMatch(requestedMatch);
+                else showScreen('dashboard-screen');
+
+            } catch (e) {
+                alert("অ্যাকাউন্ট খুলতে সমস্যা হয়েছে! এরর: " + e.message);
+                showScreen('welcome-screen');
+            }
+        }
+
+        // --- Create New Match (Firestore) ---
+        async function createMatch() {
+            const nameA = document.getElementById('teamA-name-input').value;
+            const fileA = document.getElementById('teamA-image-input').files[0];
+            const nameB = document.getElementById('teamB-name-input').value;
+            const fileB = document.getElementById('teamB-image-input').files[0];
+
+            if (!nameA || !fileA || !nameB || !fileB) return alert("সবগুলো ঘরের তথ্য দিন!");
+
+            document.getElementById('loading-text').innerText = "ম্যাচ তৈরি হচ্ছে (ছবি আপলোড চলছে)...";
+            showScreen('loading-screen');
+
+            try {
+                const [urlA, urlB] = await Promise.all([ uploadImage(fileA), uploadImage(fileB) ]);
+
+                // Firestore-এ ম্যাচ সেভ করা
+                const docRef = await db.collection('matches').add({
+                    creatorPhone: currentUserPhone,
+                    teamA: { name: nameA, logo: urlA, score: 0 },
+                    teamB: { name: nameB, logo: urlB, score: 0 },
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                currentMatchId = docRef.id;
+
+                // ইউজারের ম্যাচ বানানোর কাউন্ট ১ বাড়িয়ে দেওয়া
+                if(currentUserPhone) {
+                    await db.collection('users').doc(currentUserPhone).update({
+                        matchCreatedCount: firebase.firestore.FieldValue.increment(1)
+                    });
+                    
+                    // ড্যাশবোর্ডের লেখা আপডেট করা
+                    const userDoc = await db.collection('users').doc(currentUserPhone).get();
+                    document.getElementById('display-matches').innerText = "ম্যাচ বানিয়েছেন: " + userDoc.data().matchCreatedCount;
+                }
+
+                const shareUrl = window.location.origin + window.location.pathname + "?match=" + currentMatchId;
+                document.getElementById('generated-link').innerText = shareUrl;
+                showScreen('share-link-screen');
+
+            } catch (e) {
+                alert("ম্যাচ তৈরি করতে সমস্যা হয়েছে! এরর: " + e.message);
+                showScreen('dashboard-screen');
+            }
+        }
+
+        function copyLink() {
+            const link = document.getElementById('generated-link').innerText;
+            navigator.clipboard.writeText(link);
+            alert("লিংক কপি হয়েছে! এবার বন্ধুদের ইনবক্সে দিন।");
+        }
+
+        function goToMyMatch() {
+            window.location.href = "?match=" + currentMatchId;
+        }
+
+        function goHome() {
+            window.location.href = window.location.pathname;
+        }
+
+        // --- Play Match Logic (Firestore Live Snapshot) ---
+        function loadMatch(matchId) {
+            currentMatchId = matchId;
+            document.getElementById('loading-text').innerText = "যুদ্ধক্ষেত্র প্রস্তুত হচ্ছে...";
+            showScreen('loading-screen');
+
+            // onSnapshot এর মাধ্যমে লাইভ ডাটা আনা
+            db.collection('matches').doc(matchId).onSnapshot((doc) => {
+                if (!doc.exists) {
+                    alert("এই ম্যাচটি আর নেই বা লিংকটি ভুল!");
+                    return goHome();
+                }
+
+                const data = doc.data();
+
+                if(document.getElementById('main-screen').style.display !== 'flex'){
+                    document.getElementById('ui-teamA-name').innerText = data.teamA.name;
+                    document.getElementById('ui-teamB-name').innerText = data.teamB.name;
+                    document.getElementById('ui-teamA-logo').src = data.teamA.logo;
+                    document.getElementById('ui-teamB-logo').src = data.teamB.logo;
+                    document.getElementById('btn-textA').innerText = "VOTE " + data.teamA.name.substring(0,6);
+                    document.getElementById('btn-textB').innerText = "VOTE " + data.teamB.name.substring(0,6);
+                    showScreen('main-screen');
+                }
+
+                const scoreA = data.teamA.score || 0;
+                const scoreB = data.teamB.score || 0;
+                
+                document.getElementById('score-teamA').innerText = scoreA.toLocaleString('en-US');
+                document.getElementById('score-teamB').innerText = scoreB.toLocaleString('en-US');
+
+                let total = scoreA + scoreB;
+                let pctA = total === 0 ? 50 : (scoreA / total) * 100;
+                let pctB = total === 0 ? 50 : (scoreB / total) * 100;
+
+                document.getElementById('teamA-progress').style.width = pctA + '%';
+                document.getElementById('teamB-progress').style.width = pctB + '%';
+            });
+        }
+
+        // --- Click Events (Firestore Increment) ---
+        document.getElementById('btn-teamA').addEventListener('click', () => {
+            if(!currentMatchId) return;
+            db.collection('matches').doc(currentMatchId).update({ 
+                "teamA.score": firebase.firestore.FieldValue.increment(1) 
+            });
+            if (navigator.vibrate) navigator.vibrate(30);
+        });
+
+        document.getElementById('btn-teamB').addEventListener('click', () => {
+            if(!currentMatchId) return;
+            db.collection('matches').doc(currentMatchId).update({ 
+                "teamB.score": firebase.firestore.FieldValue.increment(1) 
+            });
+            if (navigator.vibrate) navigator.vibrate(30);
+        });
+
+        async function shareMatchUrl() {
+            const teamAName = document.getElementById('ui-teamA-name').innerText;
+            const teamBName = document.getElementById('ui-teamB-name').innerText;
+            const shareData = {
+                title: `${teamAName} vs ${teamBName} - Live War!`,
+                text: `লাইভ যুদ্ধ চলছে! ${teamAName} নাকি ${teamBName}? লিংকে ঢুকে তোমার দলকে জেতাও! 🏆`,
+                url: window.location.href 
+            };
+            if (navigator.share) await navigator.share(shareData);
+            else copyLink(); 
+        }
+    </script>
+</body>
+</html>
