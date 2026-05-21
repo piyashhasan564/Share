@@ -4,6 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Team War - Live Battle Platform</title>
+    <!-- Social Media Share Meta Tags -->
+    <meta property="og:title" content="Team War - Live Battle Platform">
+    <meta property="og:description" content="লাইভ যুদ্ধ চলছে! আপনার দলকে জেতাতে লিংকে ঢুকে ভোট দিন। বন্ধুদের সাথে শেয়ার করে চ্যালেঞ্জ করুন!">
+    <!-- নিচের content="এখানে_আপনার_ছবির_লিংক_দিবেন" এর জায়গায় আপনার আপলোড করা ছবির লিংক দিন -->
+    <meta property="og:image" content="https://i.ibb.co.com/Wvb9qQtZ/1779367501591.png">
+    <meta property="og:url" content="https://live-team-war.pages.dev/">
+    <meta property="og:type" content="website">
+    
+    <!-- Twitter Card (Twitter/X এ শেয়ার করার জন্য) -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Team War - Live Battle">
+    <meta name="twitter:description" content="লাইভ যুদ্ধ চলছে! আপনার দলকে জেতাতে লিংকে ঢুকে ভোট দিন।">
+    <meta name="twitter:image" content="https://i.ibb.co.com/Wvb9qQtZ/1779367501591.png">
     
     <!-- Firebase SDK (Version 8) - changed database to firestore -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -167,7 +180,7 @@
         
         
         
-        .
+        
     </style>
 </head>
 <body>
@@ -218,11 +231,11 @@
             <p style="color:#aaa; margin-bottom:15px;">আপনার পছন্দমতো দুটি দল তৈরি করুন</p>
             
             <h4 style="color:#6cb4ee; text-align:left; margin-bottom:5px;">Team A (বাম পাশ)</h4>
-            <input type="text" id="teamA-name-input" placeholder="১ম দলের নাম (যেমন: Science)" required>
+            <input type="text" id="teamA-name-input" placeholder="১ম দলের নাম " required>
             <input type="file" id="teamA-image-input" accept="image/*" required>
 
             <h4 style="color:#ff4d4d; text-align:left; margin-bottom:5px; margin-top:10px;">Team B (ডান পাশ)</h4>
-            <input type="text" id="teamB-name-input" placeholder="২য় দলের নাম (যেমন: Arts)" required>
+            <input type="text" id="teamB-name-input" placeholder="২য় দলের নাম )" required>
             <input type="file" id="teamB-image-input" accept="image/*" required>
 
             <button class="submit-btn dashboard-btn flex-center" onclick="createMatch()" style="margin-top:15px;">
