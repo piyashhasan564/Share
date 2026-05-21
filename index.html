@@ -23,9 +23,15 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700;900&display=swap');
+        /* গুগলের প্রিমিয়াম Noto Sans Bengali ফন্ট */
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700;800&display=swap');
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Hind Siliguri', sans-serif; }
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Noto Sans Bengali', sans-serif; 
+        }
 
         body {
             background-color: #121212; color: white; display: flex; flex-direction: column;
@@ -174,8 +180,76 @@
         .header-ad-box iframe, .header-ad-box img, .header-ad-box script { 
             width: 100%; height: 100%; border: none; object-fit: contain; 
         }
+        /* Ultra Premium File Upload Box */
+        .premium-file-upload {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            padding: 16px;
+            margin-bottom: 18px;
+            background: linear-gradient(145deg, #1a1a24, #121218);
+            border: 2px dashed rgba(0, 198, 255, 0.4);
+            border-radius: 12px;
+            color: #00c6ff;
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: inset 0 5px 10px rgba(0,0,0,0.6), 0 4px 15px rgba(0, 198, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+        .premium-file-upload:hover {
+            border-color: #f1c40f;
+            color: #f1c40f;
+            box-shadow: inset 0 5px 10px rgba(0,0,0,0.6), 0 0 15px rgba(241, 196, 15, 0.3);
+        }
+        /* আসল ফাইল ইনপুটটি লুকিয়ে ফেলা হচ্ছে */
+        .hidden-file-input {
+            display: none;
+        }
+        /* Premium 3D Custom Popup Box */
+        .premium-popup-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999; opacity: 0; visibility: hidden; transition: 0.3s ease;
+        }
+        .premium-popup-overlay.show { opacity: 1; visibility: visible; }
         
+        .premium-popup-box {
+            background: linear-gradient(145deg, #22222d, #181820);
+            border: 1px solid rgba(255,255,255,0.05); border-radius: 24px;
+            padding: 35px 25px; width: 90%; max-width: 380px; text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9), inset 0 2px 2px rgba(255,255,255,0.05);
+            transform: scale(0.7) translateY(30px); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .premium-popup-overlay.show .premium-popup-box { transform: scale(1) translateY(0); }
         
+        .premium-popup-icon svg { width: 70px; height: 70px; margin-bottom: 15px; filter: drop-shadow(0 5px 15px currentColor); }
+        .premium-popup-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 10px; color: #fff; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+        .premium-popup-text { font-size: 1.05rem; color: #b3b3b3; margin-bottom: 25px; line-height: 1.5; }
+        
+        .premium-popup-btn {
+            color: white; border: none; padding: 14px 0; font-size: 1.2rem; font-weight: 800; 
+            border-radius: 15px; cursor: pointer; width: 100%; transition: 0.2s;
+        }
+        .premium-popup-btn:active { transform: translateY(5px); }
+
+        /* Success Theme (সবুজ) */
+        .popup-success .premium-popup-icon { color: #2ecc71; }
+        .popup-success .premium-popup-btn { background: linear-gradient(145deg, #27ae60, #1e8449); box-shadow: 0 8px 0 #145a32, 0 15px 25px rgba(39, 174, 96, 0.4); }
+        .popup-success .premium-popup-btn:active { box-shadow: 0 0 0 #145a32; }
+
+        /* Error Theme (লাল) */
+        .popup-error .premium-popup-icon { color: #ff4d4d; }
+        .popup-error .premium-popup-btn { background: linear-gradient(145deg, #ff4d4d, #c0392b); box-shadow: 0 8px 0 #922b21, 0 15px 25px rgba(255, 77, 77, 0.4); }
+        .popup-error .premium-popup-btn:active { box-shadow: 0 0 0 #922b21; }
+        
+        /* Info/Warning Theme (হলুদ) */
+        .popup-info .premium-popup-icon { color: #f1c40f; }
+        .popup-info .premium-popup-btn { background: linear-gradient(145deg, #f1c40f, #f39c12); box-shadow: 0 8px 0 #b9770e, 0 15px 25px rgba(241, 196, 15, 0.4); color: #111; }
+        .popup-info .premium-popup-btn:active { box-shadow: 0 0 0 #b9770e; }
         
         
         
@@ -198,7 +272,12 @@
             <input type="tel" id="user-phone-input" placeholder="আপনার মোবাইল নাম্বার (যেমন: 017...)" required>
             
             <p style="font-size: 0.85rem; color: #888; text-align: left; margin-bottom: 5px;">প্রোফাইল ছবি (ঐচ্ছিক):</p>
-            <input type="file" id="user-image-input" accept="image/*">
+            
+            <label for="user-image-input" class="premium-file-upload" id="user-box" style="padding: 12px; margin-bottom: 20px;">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <span id="file-label-user">আপনার ছবি দিন (ঐচ্ছিক)</span>
+            </label>
+            <input type="file" id="user-image-input" class="hidden-file-input" accept="image/*" onchange="updateFileName('user-image-input', 'file-label-user', 'user-box')">
             
             <button class="submit-btn flex-center" onclick="setupProfile()">
                 প্রবেশ করুন
@@ -230,11 +309,24 @@
             
             <h4 style="color:#6cb4ee; text-align:left; margin-bottom:5px;">Team A (বাম পাশ)</h4>
             <input type="text" id="teamA-name-input" placeholder="১ম দলের নাম " required>
-            <input type="file" id="teamA-image-input" accept="image/*" required>
+            
+            <!-- Team A Premium File Upload -->
+            <label for="teamA-image-input" class="premium-file-upload" id="teamA-box">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <span id="file-label-A">দলের লোগো আপলোড করুন</span>
+            </label>
+            <input type="file" id="teamA-image-input" class="hidden-file-input" accept="image/*" onchange="updateFileName('teamA-image-input', 'file-label-A', 'teamA-box')">
+
 
             <h4 style="color:#ff4d4d; text-align:left; margin-bottom:5px; margin-top:10px;">Team B (ডান পাশ)</h4>
-            <input type="text" id="teamB-name-input" placeholder="২য় দলের নাম )" required>
-            <input type="file" id="teamB-image-input" accept="image/*" required>
+            <input type="text" id="teamB-name-input" placeholder="২য় দলের নাম " required>
+            
+            <!-- Team B Premium File Upload -->
+            <label for="teamB-image-input" class="premium-file-upload" id="teamB-box">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <span id="file-label-B">দলের লোগো আপলোড করুন</span>
+            </label>
+            <input type="file" id="teamB-image-input" class="hidden-file-input" accept="image/*" onchange="updateFileName('teamB-image-input', 'file-label-B', 'teamB-box')">
 
             <button class="submit-btn dashboard-btn flex-center" onclick="createMatch()" style="margin-top:15px;">
                 ম্যাচ তৈরি করুন
@@ -413,7 +505,15 @@
         <button class="share-btn" onclick="shareMatchUrl()">📲 বন্ধুদের চ্যালেঞ্জ করুন!</button>
         <button class="share-btn" onclick="goHome()" style="background:#444; margin-top:15px; box-shadow:none;">🏠 নতুন ম্যাচ বানান</button>
     </div>
-
+<!-- Premium Custom Popup -->
+    <div id="premium-popup-overlay" class="premium-popup-overlay">
+        <div class="premium-popup-box" id="premium-popup-box">
+            <div class="premium-popup-icon" id="premium-popup-icon"></div>
+            <h3 class="premium-popup-title" id="premium-popup-title">টাইটেল</h3>
+            <p class="premium-popup-text" id="premium-popup-text">এখানে মেসেজ থাকবে...</p>
+            <button class="premium-popup-btn" onclick="closePremiumPopup()">OK</button>
+        </div>
+    </div>
     <script>
         // --- Firebase Configuration ---
         const firebaseConfig = {
@@ -435,34 +535,92 @@
 
         // Global Variables
         let currentMatchId = null;
-        let currentUserPhone = null; 
+        let currentUserPhone = localStorage.getItem('savedPhone'); 
         const urlParams = new URLSearchParams(window.location.search);
         const requestedMatch = urlParams.get('match'); 
+        let hasVoted = false;
+// --- Premium Popup Logic ---
+        let popupCallback = null;
+
+        function showPremiumPopup(title, message, type = 'success', callback = null) {
+            const overlay = document.getElementById('premium-popup-overlay');
+            const box = document.getElementById('premium-popup-box');
+            const iconDiv = document.getElementById('premium-popup-icon');
+            
+            document.getElementById('premium-popup-title').innerText = title;
+            document.getElementById('premium-popup-text').innerText = message;
+            popupCallback = callback; // OK চাপলে কী হবে সেটা মনে রাখা
+
+            // থিম ও আইকন সেট করা
+            box.className = 'premium-popup-box popup-' + type;
+            if (type === 'success') {
+                iconDiv.innerHTML = '<svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+            } else if (type === 'error') {
+                iconDiv.innerHTML = '<svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+            } else {
+                iconDiv.innerHTML = '<svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>';
+            }
+            
+            overlay.classList.add('show');
+        }
+
+        function closePremiumPopup() {
+            document.getElementById('premium-popup-overlay').classList.remove('show');
+            if (popupCallback) {
+                popupCallback(); // OK বাটনে চাপলে নির্দিষ্ট কাজ (যেমন: রিডাইরেক্ট) করবে
+                popupCallback = null;
+            }
+        }
+        // আপডেট: লগিন করা থাকুক বা না থাকুক, ভোট ট্র্যাক হবে Device ID দিয়ে
+        function getVoterId() {
+            let deviceId = localStorage.getItem('voterDeviceId');
+            if (!deviceId) {
+                // পুরোনো guestId থাকলে সেটাই নিবে, না থাকলে নতুন বানাবে
+                deviceId = localStorage.getItem('guestId') || ('voter_' + Math.random().toString(36).substr(2, 9));
+                localStorage.setItem('voterDeviceId', deviceId);
+            }
+            return deviceId;
+        }
+        let voterId = getVoterId();
 
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
             document.getElementById(screenId).classList.add('active-screen');
         }
 
-        // --- App Initialization ---
+        // --- App Initialization (Updated for Guest Voting) ---
         window.onload = () => {
-            const savedPhone = localStorage.getItem('savedPhone');
-            const showDash = urlParams.get('dashboard'); // ইউজার ড্যাশবোর্ডে যেতে চাইছে কি না
+            const showDash = urlParams.get('dashboard');
 
-            if (savedPhone) {
-                currentUserPhone = savedPhone;
-                // Firestore থেকে ইউজারের ডাটা আনবে
-                db.collection('users').doc(savedPhone).get().then((doc) => {
+            // ১. যদি কেউ শেয়ার করা লিংকে ক্লিক করে আসে (?match=...)
+            if (requestedMatch) {
+                if (currentUserPhone) {
+                    // লগিন করা থাকলে প্রোফাইল ডাটা আনবে
+                    db.collection('users').doc(currentUserPhone).get().then(doc => {
+                        if(doc.exists) {
+                            const u = doc.data();
+                            updateProfileUI(u.name, u.profileImage, u.matchCreatedCount);
+                        }
+                    });
+                } else {
+                    // লগিন করা না থাকলে (Guest হলে) প্রোফাইল ব্যাজটি লুকিয়ে ফেলব
+                    document.querySelectorAll('.profile-badge').forEach(el => el.style.display = 'none');
+                }
+                loadMatch(requestedMatch); // অ্যাকাউন্ট ছাড়াই সরাসরি খেলায় প্রবেশ
+                return;
+            }
+
+            // ২. যদি সরাসরি মেইন লিংকে আসে
+            if (currentUserPhone) {
+                db.collection('users').doc(currentUserPhone).get().then((doc) => {
                     if (doc.exists) {
                         const userData = doc.data();
                         updateProfileUI(userData.name, userData.profileImage, userData.matchCreatedCount);
                         
-                        if (requestedMatch) {
-                            loadMatch(requestedMatch); // যদি অন্য কারও পাঠানো লিংকে ঢুকে থাকে
-                        } else if (!showDash && userData.lastMatchId) {
-                            loadMatch(userData.lastMatchId); // অটোমেটিক নিজের বানানো লাস্ট ম্যাচে ঢুকবে
+                        if (!showDash && userData.lastMatchId) {
+                            loadMatch(userData.lastMatchId); 
                         } else {
-                            showScreen('dashboard-screen'); // যদি লাস্ট ম্যাচ না থাকে বা নতুন ম্যাচ বানাতে চায়
+                            showScreen('dashboard-screen'); 
                         }
                     } else {
                         showScreen('welcome-screen');
@@ -492,7 +650,7 @@
             throw new Error("ImgBB Upload failed");
         }
 
-     // --- Profile Setup (Firestore + Optional Image) ---
+        // --- Profile Setup ---
         async function setupProfile() {
             const name = document.getElementById('user-name-input').value;
             const phone = document.getElementById('user-phone-input').value;
@@ -513,7 +671,7 @@
                 const doc = await userRef.get();
                 
                 let matchCount = 0;
-                let lastMatch = null; // লাস্ট ম্যাচের ভ্যারিয়েবল
+                let lastMatch = null; 
                 
                 if(doc.exists) {
                     matchCount = doc.data().matchCreatedCount || 0;
@@ -525,11 +683,13 @@
                     phone: phone,
                     profileImage: imgUrl,
                     matchCreatedCount: matchCount,
-                    lastMatchId: lastMatch // লগিনের সময় লাস্ট ম্যাচ আইডি ঠিক রাখা
+                    lastMatchId: lastMatch 
                 }, { merge: true });
 
+               // আপডেট করা কোড:
                 localStorage.setItem('savedPhone', phone);
                 currentUserPhone = phone;
+                
                 updateProfileUI(name, imgUrl, matchCount);
 
                 const showDash = urlParams.get('dashboard');
@@ -544,7 +704,7 @@
             }
         }
 
-        // --- Create New Match (Firestore) ---
+        // --- Create New Match ---
         async function createMatch() {
             const nameA = document.getElementById('teamA-name-input').value;
             const fileA = document.getElementById('teamA-image-input').files[0];
@@ -569,7 +729,6 @@
                 currentMatchId = docRef.id;
 
                 if(currentUserPhone) {
-                    // এখানে lastMatchId যুক্ত করা হলো
                     await db.collection('users').doc(currentUserPhone).update({
                         matchCreatedCount: firebase.firestore.FieldValue.increment(1),
                         lastMatchId: currentMatchId 
@@ -592,7 +751,7 @@
         function copyLink() {
             const link = document.getElementById('generated-link').innerText;
             navigator.clipboard.writeText(link);
-            alert("লিংক কপি হয়েছে! এবার বন্ধুদের ইনবক্সে দিন।");
+            showPremiumPopup("লিংক কপি হয়েছে!", "এবার লিংকটি বন্ধুদের ইনবক্সে দিন।", "info");
         }
 
         function goToMyMatch() {
@@ -600,20 +759,20 @@
         }
 
         function goHome() {
-            // ড্যাশবোর্ডে যাওয়ার স্পেশাল লিংক
-            window.location.href = window.location.pathname + "?dashboard=true";
+            // যদি একাউন্ট থাকে, তাহলে ড্যাশবোর্ডে যাবে, না থাকলে রেজিস্ট্রেশন পেজে যাবে
+            if (currentUserPhone) {
+                window.location.href = window.location.pathname + "?dashboard=true";
+            } else {
+                window.location.href = window.location.pathname; 
+            }
         }
 
-        // Global Variable for Voting State
-        let hasVoted = false;
-
-        // --- Play Match Logic (Firestore Live Snapshot) ---
+        // --- Play Match Logic (Live Snapshot) ---
         function loadMatch(matchId) {
             currentMatchId = matchId;
             document.getElementById('loading-text').innerText = "যুদ্ধক্ষেত্র প্রস্তুত হচ্ছে...";
             showScreen('loading-screen');
 
-            // onSnapshot এর মাধ্যমে লাইভ ডাটা আনা
             db.collection('matches').doc(matchId).onSnapshot((doc) => {
                 if (!doc.exists) {
                     alert("এই ম্যাচটি আর নেই বা লিংকটি ভুল!");
@@ -622,27 +781,24 @@
 
                 const data = doc.data();
 
-                // UI প্রথমবার লোড হওয়া
                 if(document.getElementById('main-screen').style.display !== 'flex'){
                     document.getElementById('ui-teamA-name').innerText = data.teamA.name;
                     document.getElementById('ui-teamB-name').innerText = data.teamB.name;
                     document.getElementById('ui-teamA-logo').src = data.teamA.logo;
                     document.getElementById('ui-teamB-logo').src = data.teamB.logo;
-                    document.getElementById('btn-textA').innerText = "VOTE";
-                    document.getElementById('btn-textB').innerText = "VOTE";
                     showScreen('main-screen');
                 }
 
-                // *** চেক করা যে ইউজার কোন দলে ভোট দিয়েছে ***
+                // *** চেক করা যে ইউজার বা Guest কোন দলে ভোট দিয়েছে ***
                 const votersA = data.votersA || [];
                 const votersB = data.votersB || [];
                 
-                if (votersA.includes(currentUserPhone)) {
+                if (votersA.includes(voterId)) {
                     hasVoted = true;
                     document.getElementById('btn-teamA').classList.add('voted-active');
                     document.getElementById('btn-teamB').classList.add('voted-inactive');
                     document.getElementById('btn-textA').innerText = "VOTED";
-                } else if (votersB.includes(currentUserPhone)) {
+                } else if (votersB.includes(voterId)) {
                     hasVoted = true;
                     document.getElementById('btn-teamB').classList.add('voted-active');
                     document.getElementById('btn-teamA').classList.add('voted-inactive');
@@ -655,7 +811,6 @@
                     document.getElementById('btn-textB').innerText = "VOTE B";
                 }
 
-                // লাইভ স্কোর আপডেট
                 const scoreA = data.teamA.score || 0;
                 const scoreB = data.teamB.score || 0;
                 
@@ -671,40 +826,36 @@
             });
         }
 
-        // আপনার Adsterra বা Monetag এর ডিরেক্ট লিংকটি এই ডবল কোটেশনের ভেতরে দিন
     const directAdLink = "https://www.effectivecpmnetwork.com/a8erxbisad?key=f2f600351266e36372fec37583558fa7";
 
     document.getElementById('btn-teamA').addEventListener('click', async () => {
         if(!currentMatchId || hasVoted) return; 
         hasVoted = true; 
         
-        // সাথে সাথে UI আপডেট (Grey color)
         document.getElementById('btn-teamA').classList.add('voted-active');
         document.getElementById('btn-teamB').classList.add('voted-inactive');
         document.getElementById('btn-textA').innerText = "VOTED";
 
         try {
-            // ১. ডাটাবেসে Team A এর জন্য ভোটারের নাম্বার সেভ করা
             await db.collection('matches').doc(currentMatchId).update({ 
                 "teamA.score": firebase.firestore.FieldValue.increment(1),
-                "votersA": firebase.firestore.FieldValue.arrayUnion(currentUserPhone) 
+                "votersA": firebase.firestore.FieldValue.arrayUnion(voterId) 
             });
             
             if (navigator.vibrate) navigator.vibrate(30);
-
-            // ২. মেসেজ দেখানো
-            alert("✅ আপনার ভোট সফলভাবে যুক্ত হয়েছে!");
-
-            // ৩. রিডাইরেক্ট
-            window.location.href = directAdLink;
+            
+            // নতুন প্রিমিয়াম পপআপ (OK চাপলে অ্যাডের লিংকে যাবে)
+            showPremiumPopup("ভোট সফল!", "আপনার ভোট সফলভাবে যুক্ত হয়েছে!", "success", () => {
+                window.location.href = directAdLink;
+            });
 
         } catch(e) { 
             hasVoted = false; 
-            // ফেইল হলে বাটন আবার আগের মতো করা
             document.getElementById('btn-teamA').classList.remove('voted-active');
             document.getElementById('btn-teamB').classList.remove('voted-inactive');
             document.getElementById('btn-textA').innerText = "VOTE A";
-            alert("ভোট দিতে সমস্যা হয়েছে!");
+            
+            showPremiumPopup("সমস্যা!", "ভোট দিতে সমস্যা হয়েছে। আবার চেষ্টা করুন।", "error");
         }
     });
 
@@ -712,33 +863,30 @@
         if(!currentMatchId || hasVoted) return;
         hasVoted = true;
         
-        // সাথে সাথে UI আপডেট (Grey color)
         document.getElementById('btn-teamB').classList.add('voted-active');
         document.getElementById('btn-teamA').classList.add('voted-inactive');
         document.getElementById('btn-textB').innerText = "VOTED";
 
         try {
-            // ১. ডাটাবেসে Team B এর জন্য ভোটারের নাম্বার সেভ করা
             await db.collection('matches').doc(currentMatchId).update({ 
                 "teamB.score": firebase.firestore.FieldValue.increment(1),
-                "votersB": firebase.firestore.FieldValue.arrayUnion(currentUserPhone) 
+                "votersB": firebase.firestore.FieldValue.arrayUnion(voterId) 
             });
 
             if (navigator.vibrate) navigator.vibrate(30);
-
-            // ২. মেসেজ দেখানো
-            alert("✅ আপনার ভোট সফলভাবে যুক্ত হয়েছে!");
-
-            // ৩. রিডাইরেক্ট
-            window.location.href = directAdLink;
+            
+            // নতুন প্রিমিয়াম পপআপ (OK চাপলে অ্যাডের লিংকে যাবে)
+            showPremiumPopup("ভোট সফল!", "আপনার ভোট সফলভাবে যুক্ত হয়েছে!", "success", () => {
+                window.location.href = directAdLink;
+            });
 
         } catch(e) { 
             hasVoted = false; 
-            // ফেইল হলে বাটন আবার আগের মতো করা
             document.getElementById('btn-teamB').classList.remove('voted-active');
             document.getElementById('btn-teamA').classList.remove('voted-inactive');
             document.getElementById('btn-textB').innerText = "VOTE B";
-            alert("ভোট দিতে সমস্যা হয়েছে!");
+            
+            showPremiumPopup("সমস্যা!", "ভোট দিতে সমস্যা হয়েছে। আবার চেষ্টা করুন।", "error");
         }
     });
 
@@ -751,7 +899,6 @@
                 url: window.location.href 
             };
             
-            // এই navigator.share সিস্টেমটিই আপনার স্ক্রিনশটের মেনু ওপেন করবে
             if (navigator.share) {
                 try {
                     await navigator.share(shareData);
@@ -759,9 +906,34 @@
                     console.log("Share cancelled or failed");
                 }
             } else {
-                copyLink(); // মোবাইল ব্রাউজার না হলে বা অফলাইন ফাইল হলে শুধু কপি হবে
+                copyLink();
             }
         }
-    </script>
+        // ফাইল আপলোড বক্সে ছবির নাম ও টিক মার্ক দেখানোর জন্য
+        function updateFileName(inputId, labelId, boxId) {
+            const input = document.getElementById(inputId);
+            const label = document.getElementById(labelId);
+            const box = document.getElementById(boxId);
+            
+            if (input.files && input.files.length > 0) {
+                // ফাইলের নাম যদি বড় হয় তবে কেটে ছোট করে দেখানো হবে
+                let fileName = input.files[0].name;
+                if(fileName.length > 20) fileName = fileName.substring(0, 20) + "...";
+                
+                label.innerText = "✅ " + fileName;
+                box.style.borderColor = "#2ecc71"; // বর্ডার সবুজ হবে
+                box.style.color = "#2ecc71"; // লেখাও সবুজ হবে
+                box.style.boxShadow = "inset 0 5px 10px rgba(0,0,0,0.6), 0 0 15px rgba(46, 204, 113, 0.4)";
+            } else {
+                label.innerText = "লোগো আপলোড করুন";
+                box.style.borderColor = "rgba(0, 198, 255, 0.4)";
+                box.style.color = "#00c6ff";
+            }
+        }
+        
+        
+        
+        
+</script>
 </body>
 </html>
