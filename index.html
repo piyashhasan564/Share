@@ -35,10 +35,17 @@
 
         body {
             background-color: #121212; color: white; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; min-height: 100vh; overflow-x: hidden; padding: 20px;
+            align-items: center; 
+            justify-content: flex-start; /* center থেকে flex-start করা হলো যাতে স্ক্রল করা যায় */
+            min-height: 100vh; overflow-x: hidden; 
+            padding: 40px 20px 80px 20px; /* নিচে কীবোর্ডের জন্য এক্সট্রা জায়গা রাখা হলো */
         }
 
-        .screen { display: none; width: 100%; max-width: 500px; flex-direction: column; align-items: center; animation: fadeIn 0.5s ease; }
+        .screen { 
+            display: none; width: 100%; max-width: 500px; flex-direction: column; 
+            align-items: center; animation: fadeIn 0.5s ease; 
+            margin: auto 0; /* স্ক্রিনটি যাতে দেখতে মাঝখানেই মনে হয় */
+        }
         .active-screen { display: flex; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -1021,7 +1028,14 @@
                 box.style.color = "#00c6ff";
             }
         }
-        
+        // --- কীবোর্ড ওপেন হলে অটোমেটিক স্ক্রল করার ফাংশন ---
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('focus', function() {
+                setTimeout(() => {
+                    this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 400); // কীবোর্ড ওপেন হওয়ার জন্য ৪০০ মিলিসেকেন্ড সময় নিবে তারপর স্ক্রল হবে
+            });
+        });
         
         
         
