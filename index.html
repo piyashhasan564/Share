@@ -66,7 +66,28 @@
         .spinner { width: 50px; height: 50px; border: 5px solid #333; border-top: 5px solid #f1c40f; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        .top-bar { width: 100%; display: flex; justify-content: flex-start; align-items: center; margin-bottom: 20px; }
+        /* Top Bar Updated for Ad Space */
+        .top-bar { 
+            width: 100%; display: flex; justify-content: space-between; /* space-between দিলে অ্যাড ডানপাশে চলে যাবে */
+            align-items: center; margin-bottom: 20px; 
+        }
+
+        /* Header Banner Ad 3D Box */
+        .header-ad-box {
+            width: 150px; /* অ্যাডের সাইজ অনুযায়ী ছোট-বড় করতে পারবেন */
+            height: 50px; 
+            background: linear-gradient(145deg, #1a1a24, #121218);
+            border: 1px dashed rgba(241, 196, 15, 0.4);
+            border-radius: 12px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.8), 0 5px 10px rgba(0,0,0,0.5);
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden; color: #888; font-size: 0.75rem; font-weight: bold;
+        }
+        
+        /* অ্যাড নেটওয়ার্কের কোড বা ছবির জন্য */
+        .header-ad-box iframe, .header-ad-box img { 
+            width: 100%; height: 100%; border: none; object-fit: cover; 
+        }
         .profile-badge { display: flex; align-items: center; gap: 12px; background: rgba(255, 255, 255, 0.08); padding: 6px 18px 6px 6px; border-radius: 50px; border: 1px solid rgba(241, 196, 15, 0.3); backdrop-filter: blur(8px); }
         .avatar-container { position: relative; }
         .user-avatar { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #f1c40f; }
@@ -218,7 +239,8 @@
 
     <!-- 5. Main Game Screen -->
     <div id="main-screen" class="screen">
-        <div class="top-bar">
+      <div class="top-bar">
+            <!-- ইউজারের প্রোফাইল (আগে থেকেই আছে) -->
             <div class="profile-badge">
                 <div class="avatar-container">
                     <img src="" alt="User" class="user-avatar display-avatar">
@@ -228,6 +250,12 @@
                     <span class="user-name display-name">Name</span>
                     <span class="user-status">● Online</span>
                 </div>
+            </div>
+
+            <!-- নতুন: ডানপাশের অ্যাড বক্স (এটি বসিয়ে দিন) -->
+            <div class="header-ad-box">
+                <!-- আপনার Monetag বা Adsterra এর Banner Ad এর কোডটি এখানে বসাবেন -->
+                AD SPACE
             </div>
         </div>
 
@@ -590,30 +618,56 @@
             });
         }
 
-        // --- Click Events (Firestore Increment & Saving Voter) ---
-        document.getElementById('btn-teamA').addEventListener('click', () => {
-            if(!currentMatchId || hasVoted) return; // আগে ভোট দিয়ে থাকলে কাজ করবে না
-            hasVoted = true; // সাথে সাথে লক করে দেওয়া হলো যেন ডাবল ক্লিক না করতে পারে
-            
-            db.collection('matches').doc(currentMatchId).update({ 
+        // আপনার Adsterra বা Monetag এর ডিরেক্ট লিংকটি এই ডবল কোটেশনের ভেতরে দিন
+    const directAdLink = "https://আপনার_ডিরেক্ট_লিংক_এখানে_দিন.com";
+
+    document.getElementById('btn-teamA').addEventListener('click', async () => {
+        if(!currentMatchId || hasVoted) return; 
+        hasVoted = true; 
+        
+        try {
+            // ১. ডাটাবেসে ভোট সেভ করা
+            await db.collection('matches').doc(currentMatchId).update({ 
                 "teamA.score": firebase.firestore.FieldValue.increment(1),
-                "voters": firebase.firestore.FieldValue.arrayUnion(currentUserPhone) // ইউজারের নাম্বার সেভ করে রাখা
-            }).catch(e => { hasVoted = false; });
+                "voters": firebase.firestore.FieldValue.arrayUnion(currentUserPhone) 
+            });
             
             if (navigator.vibrate) navigator.vibrate(30);
-        });
 
-        document.getElementById('btn-teamB').addEventListener('click', () => {
-            if(!currentMatchId || hasVoted) return;
-            hasVoted = true;
-            
-            db.collection('matches').doc(currentMatchId).update({ 
+            // ২. ভোট সফল হওয়ার মেসেজ দেখানো
+            alert("✅ আপনার ভোট সফলভাবে যুক্ত হয়েছে!");
+
+            // ৩. মেসেজ 'OK' করার সাথে সাথেই অ্যাডের লিংকে পাঠিয়ে দেওয়া
+            window.location.href = directAdLink;
+
+        } catch(e) { 
+            hasVoted = false; 
+        }
+    });
+
+    document.getElementById('btn-teamB').addEventListener('click', async () => {
+        if(!currentMatchId || hasVoted) return;
+        hasVoted = true;
+        
+        try {
+            // ১. ডাটাবেসে ভোট সেভ করা
+            await db.collection('matches').doc(currentMatchId).update({ 
                 "teamB.score": firebase.firestore.FieldValue.increment(1),
                 "voters": firebase.firestore.FieldValue.arrayUnion(currentUserPhone) 
-            }).catch(e => { hasVoted = false; });
+            });
 
             if (navigator.vibrate) navigator.vibrate(30);
-        });
+
+            // ২. ভোট সফল হওয়ার মেসেজ দেখানো
+            alert("✅ আপনার ভোট সফলভাবে যুক্ত হয়েছে!");
+
+            // ৩. মেসেজ 'OK' করার সাথে সাথেই অ্যাডের লিংকে পাঠিয়ে দেওয়া
+            window.location.href = directAdLink;
+
+        } catch(e) { 
+            hasVoted = false; 
+        }
+    });
 
         async function shareMatchUrl() {
             const teamAName = document.getElementById('ui-teamA-name').innerText;
