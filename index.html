@@ -641,10 +641,66 @@
             if(countEl) countEl.innerText = "ম্যাচ বানিয়েছেন: " + matchCount;
         }
 
+        // --- ১. ছবি কম্প্রেস (সাইজ কমানো) করার ফাংশন ---
+        async function compressImage(file, quality = 0.6, maxWidth = 600) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+
+                        // যদি ছবির চওড়া maxWidth (600px) এর চেয়ে বড় হয়, তবে ছোট করে নিবে
+                        if (width > maxWidth) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        // Canvas থেকে নতুন ছোট ফাইল (JPEG ফরম্যাটে) তৈরি করা
+                        canvas.toBlob((blob) => {
+                            if (blob) {
+                                const compressedFile = new File([blob], file.name, {
+                                    type: 'image/jpeg',
+                                    lastModified: Date.now()
+                                });
+                                resolve(compressedFile);
+                            } else {
+                                reject(new Error("Compression failed"));
+                            }
+                        }, 'image/jpeg', quality); // quality: 0.6 মানে ৬০% কোয়ালিটি রাখা হবে
+                    };
+                    img.onerror = (error) => reject(error);
+                };
+                reader.onerror = (error) => reject(error);
+            });
+        }
+
+        // --- ২. আপডেটেড আপলোড ফাংশন (কম্প্রেস করে আপলোড করবে) ---
         async function uploadImage(file) {
+            // যদি ফাইলটি ইমেজ না হয়, তাহলে কম্প্রেস করবে না
+            if (!file.type.startsWith('image/')) {
+                throw new Error("দয়া করে শুধুমাত্র ছবি আপলোড করুন!");
+            }
+
+            // ছবি ImgBB তে পাঠানোর আগে কম্প্রেস করা হচ্ছে
+            const compressedFile = await compressImage(file, 0.6, 600); 
+
             const formData = new FormData();
-            formData.append("image", file);
-            const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: formData });
+            formData.append("image", compressedFile); // অরিজিনাল ফাইলের বদলে ছোট ফাইলটি পাঠানো হচ্ছে
+            
+            const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { 
+                method: "POST", 
+                body: formData 
+            });
             const data = await res.json();
             if (data.success) return data.data.url;
             throw new Error("ImgBB Upload failed");
