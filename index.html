@@ -146,6 +146,28 @@
     .flex-center { display: flex; align-items: center; justify-content: center; gap: 10px; }
         .game-title { letter-spacing: 4px; text-shadow: 0 4px 15px rgba(241, 196, 15, 0.4); }
         .click-icon { width: 28px; height: 28px; margin-top: 5px; opacity: 0.9; }
+        
+        /* Voted Button States */
+.voted-active {
+    background: #555555 !important; /* Grey color */
+    box-shadow: inset 0 5px 10px rgba(0,0,0,0.6) !important;
+    transform: translateY(5px) !important;
+    color: #aaaaaa !important;
+    cursor: not-allowed !important;
+}
+.voted-inactive {
+    opacity: 0.4 !important;
+    cursor: not-allowed !important;
+    filter: grayscale(100%);
+}
+        
+        
+        
+        
+        
+        
+        
+        .
     </style>
 </head>
 <body>
@@ -591,15 +613,26 @@
                     showScreen('main-screen');
                 }
 
-                // *** চেক করা যে ইউজার আগে ভোট দিয়েছে কি না ***
-                const voters = data.voters || [];
-                if (voters.includes(currentUserPhone)) {
+                // *** চেক করা যে ইউজার কোন দলে ভোট দিয়েছে ***
+                const votersA = data.votersA || [];
+                const votersB = data.votersB || [];
+                
+                if (votersA.includes(currentUserPhone)) {
                     hasVoted = true;
-                    // বাটনগুলো ডিজেবল করে দেওয়া
-                    document.getElementById('btn-teamA').classList.add('disabled-btn');
-                    document.getElementById('btn-teamB').classList.add('disabled-btn');
+                    document.getElementById('btn-teamA').classList.add('voted-active');
+                    document.getElementById('btn-teamB').classList.add('voted-inactive');
                     document.getElementById('btn-textA').innerText = "VOTED";
+                } else if (votersB.includes(currentUserPhone)) {
+                    hasVoted = true;
+                    document.getElementById('btn-teamB').classList.add('voted-active');
+                    document.getElementById('btn-teamA').classList.add('voted-inactive');
                     document.getElementById('btn-textB').innerText = "VOTED";
+                } else {
+                    hasVoted = false;
+                    document.getElementById('btn-teamA').classList.remove('voted-active', 'voted-inactive');
+                    document.getElementById('btn-teamB').classList.remove('voted-active', 'voted-inactive');
+                    document.getElementById('btn-textA').innerText = "VOTE A";
+                    document.getElementById('btn-textB').innerText = "VOTE B";
                 }
 
                 // লাইভ স্কোর আপডেট
@@ -625,23 +658,33 @@
         if(!currentMatchId || hasVoted) return; 
         hasVoted = true; 
         
+        // সাথে সাথে UI আপডেট (Grey color)
+        document.getElementById('btn-teamA').classList.add('voted-active');
+        document.getElementById('btn-teamB').classList.add('voted-inactive');
+        document.getElementById('btn-textA').innerText = "VOTED";
+
         try {
-            // ১. ডাটাবেসে ভোট সেভ করা
+            // ১. ডাটাবেসে Team A এর জন্য ভোটারের নাম্বার সেভ করা
             await db.collection('matches').doc(currentMatchId).update({ 
                 "teamA.score": firebase.firestore.FieldValue.increment(1),
-                "voters": firebase.firestore.FieldValue.arrayUnion(currentUserPhone) 
+                "votersA": firebase.firestore.FieldValue.arrayUnion(currentUserPhone) 
             });
             
             if (navigator.vibrate) navigator.vibrate(30);
 
-            // ২. ভোট সফল হওয়ার মেসেজ দেখানো
+            // ২. মেসেজ দেখানো
             alert("✅ আপনার ভোট সফলভাবে যুক্ত হয়েছে!");
 
-            // ৩. মেসেজ 'OK' করার সাথে সাথেই অ্যাডের লিংকে পাঠিয়ে দেওয়া
+            // ৩. রিডাইরেক্ট
             window.location.href = directAdLink;
 
         } catch(e) { 
             hasVoted = false; 
+            // ফেইল হলে বাটন আবার আগের মতো করা
+            document.getElementById('btn-teamA').classList.remove('voted-active');
+            document.getElementById('btn-teamB').classList.remove('voted-inactive');
+            document.getElementById('btn-textA').innerText = "VOTE A";
+            alert("ভোট দিতে সমস্যা হয়েছে!");
         }
     });
 
@@ -649,23 +692,33 @@
         if(!currentMatchId || hasVoted) return;
         hasVoted = true;
         
+        // সাথে সাথে UI আপডেট (Grey color)
+        document.getElementById('btn-teamB').classList.add('voted-active');
+        document.getElementById('btn-teamA').classList.add('voted-inactive');
+        document.getElementById('btn-textB').innerText = "VOTED";
+
         try {
-            // ১. ডাটাবেসে ভোট সেভ করা
+            // ১. ডাটাবেসে Team B এর জন্য ভোটারের নাম্বার সেভ করা
             await db.collection('matches').doc(currentMatchId).update({ 
                 "teamB.score": firebase.firestore.FieldValue.increment(1),
-                "voters": firebase.firestore.FieldValue.arrayUnion(currentUserPhone) 
+                "votersB": firebase.firestore.FieldValue.arrayUnion(currentUserPhone) 
             });
 
             if (navigator.vibrate) navigator.vibrate(30);
 
-            // ২. ভোট সফল হওয়ার মেসেজ দেখানো
+            // ২. মেসেজ দেখানো
             alert("✅ আপনার ভোট সফলভাবে যুক্ত হয়েছে!");
 
-            // ৩. মেসেজ 'OK' করার সাথে সাথেই অ্যাডের লিংকে পাঠিয়ে দেওয়া
+            // ৩. রিডাইরেক্ট
             window.location.href = directAdLink;
 
         } catch(e) { 
             hasVoted = false; 
+            // ফেইল হলে বাটন আবার আগের মতো করা
+            document.getElementById('btn-teamB').classList.remove('voted-active');
+            document.getElementById('btn-teamA').classList.remove('voted-inactive');
+            document.getElementById('btn-textB').innerText = "VOTE B";
+            alert("ভোট দিতে সমস্যা হয়েছে!");
         }
     });
 
