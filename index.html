@@ -899,58 +899,62 @@
             }
         }
 
-        // --- লিংক কপি করার আপডেট ফাংশন ---
+        // --- লিংক কপি করার আপডেট ফাংশন (টিমের নাম সহ) ---
         function copyLink() {
             let link = document.getElementById('generated-link').innerText;
             
-            // যদি কোনো কারণে ডিফল্ট 'https://...' লেখা থাকে, তাহলে আসল লিংক বানিয়ে নিবে
             if (!link.includes("?match=")) {
                 link = window.location.origin + window.location.pathname + "?match=" + currentMatchId;
             }
+
+            // টিমের নাম নিয়ে আসা হচ্ছে (যদি পাওয়া যায়)
+            let teamA = document.getElementById('teamA-name-input') ? document.getElementById('teamA-name-input').value : "Team A";
+            let teamB = document.getElementById('teamB-name-input') ? document.getElementById('teamB-name-input').value : "Team B";
             
-            navigator.clipboard.writeText(link).then(() => {
+            // মেসেঞ্জারে পেস্ট করার জন্য সুন্দর মেসেজ তৈরি
+            const fullMessage = `🔥 ${teamA} VS ${teamB} 🔥\n\nলাইভ যুদ্ধ চলছে! তোমার দলকে জেতাতে নিচের লিংকে ঢুকে ভোট দাও:\n👇👇👇\n${link}`;
+            
+            navigator.clipboard.writeText(fullMessage).then(() => {
                 showPremiumPopup("লিংক কপি হয়েছে!", "এবার লিংকটি বন্ধুদের ইনবক্সে পেস্ট করে দিন।", "success");
             }).catch(() => {
                 alert("লিংক কপি করতে সমস্যা হয়েছে!");
             });
         }
 
-        // --- শেয়ার করার আপডেট ফাংশন (Messenger Forward Support) ---
+        // --- শেয়ার করার আপডেট ফাংশন (টিমের নাম সহ) ---
         async function shareMatchUrl() {
             const teamAName = document.getElementById('ui-teamA-name').innerText;
             const teamBName = document.getElementById('ui-teamB-name').innerText;
-            
-            // সঠিক ফুল লিংকটি জেনারেট করা
             const matchUrl = window.location.origin + window.location.pathname + "?match=" + currentMatchId;
             
+            const shareText = `🔥 ${teamAName} VS ${teamBName} 🔥\nলাইভ যুদ্ধ চলছে! তোমার দলকে জেতাতে নিচের লিংকে ঢুকে ভোট দাও:\n👇👇👇\n`;
+
             const shareData = {
                 title: `${teamAName} vs ${teamBName} - Live War!`,
-                text: `লাইভ যুদ্ধ চলছে! ${teamAName} নাকি ${teamBName}? লিংকে ঢুকে তোমার দলকে জেতাও! 🏆\n\n`,
+                text: shareText,
                 url: matchUrl 
             };
 
-            // চেক করা হচ্ছে ইউজার ফেসবুক বা মেসেঞ্জারের ভেতর থেকে ব্রাউজ করছে কিনা
             const ua = navigator.userAgent || navigator.vendor || window.opera;
             const isFacebookApp = (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1) || (ua.indexOf("Messenger") > -1) || (ua.indexOf("FB_IAB") > -1);
 
             if (isFacebookApp) {
-                // ইউজার মেসেঞ্জারে থাকলে সরাসরি মেসেঞ্জারের Forward/Share উইন্ডো ওপেন করবে
-                const messengerUrl = `fb-messenger://share/?link=${encodeURIComponent(matchUrl)}`;
-                window.location.href = messengerUrl;
-                return; // এখানেই কাজ শেষ
+                // মেসেঞ্জারে থাকলে কপি করে দেয়া হচ্ছে যাতে পেস্ট করলেই মেসেজ সহ যায়
+                navigator.clipboard.writeText(shareText + matchUrl).then(() => {
+                    const messengerUrl = `fb-messenger://share/?link=${encodeURIComponent(matchUrl)}`;
+                    window.location.href = messengerUrl;
+                });
+                return;
             }
             
-            // 1. Native Share (সাধারণ ক্রোম বা সাফারি ব্রাউজারের জন্য)
             if (navigator.share) {
                 try {
                     await navigator.share(shareData);
                 } catch (e) {
                     console.log("Share cancelled by user.");
                 }
-            } 
-            // 2. যদি অন্য কোনো পিসি ব্রাউজার হয় যেখানে শেয়ার মেনু নেই, তখন লিংক কপি হবে
-            else {
-                navigator.clipboard.writeText(matchUrl).then(() => {
+            } else {
+                navigator.clipboard.writeText(shareText + matchUrl).then(() => {
                     showPremiumPopup("লিংক কপি হয়েছে!", "লিংকটি কপি করা হয়েছে। এবার বন্ধুদের ইনবক্সে পেস্ট করে দিন!", "info");
                 }).catch(() => {
                     showPremiumPopup("সমস্যা!", "লিংক কপি করা যায়নি!", "error");
